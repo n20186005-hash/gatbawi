@@ -1,0 +1,30 @@
+{
+  "name": "gatbawi-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent Korean and English visitor information guide to Gatbawi, Palgongsan.",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "DEPLOY_TARGET=cloudflare astro build",
+    "preview": "DEPLOY_TARGET=cloudflare astro preview --host 0.0.0.0",
+    "check": "astro check",
+    "deploy": "pnpm build && wrangler deploy --config ./wrangler.worker.toml ./dist/_worker.js/index.js"
+  },
+  "engines": {
+    "node": "22.13.0"
+  },
+  "packageManager": "pnpm@11.24.0",
+  "dependencies": {
+    "@astrojs/cloudflare": "14.2.5",
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.2.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "wrangler": "4.126.0"
+  }
+}
