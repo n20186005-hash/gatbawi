@@ -1,0 +1,53 @@
+---
+/** Style note: Cookie controls are framed as plain, accessible field notes rather than a marketing-style consent modal. */
+import PolicyPage from "../components/PolicyPage.astro";
+---
+
+<PolicyPage titleKo="쿠키 설정" titleEn="Cookie Settings" introKo="필수 기능과 분석 기능에 대한 선택을 여기서 언제든 변경할 수 있습니다." introEn="Change your essential-function and analytics choices here at any time.">
+  <p class="policy-date"><span class="copy-ko">최종 업데이트: 2026년 8월</span><span class="copy-en">Last updated: August 2026</span></p>
+  <h2><span class="copy-ko">쿠키와 저장소</span><span class="copy-en">Cookies and storage</span></h2>
+  <p class="copy-ko">쿠키 및 유사한 저장 기술은 사이트가 기본 설정을 기억하고, 동의한 경우에만 집계형 이용 흐름을 이해하는 데 사용될 수 있습니다. 선택값은 이 기기의 브라우저 저장소에 기록됩니다.</p>
+  <p class="copy-en">Cookies and similar storage may be used to remember basic settings and, only when you consent, to understand aggregated usage patterns. Your choices are stored in this browser on this device.</p>
+  <div class="cookie-preference-grid" aria-label="쿠키 환경설정">
+    <div class="cookie-row"><div><h3><span class="copy-ko">필수 기능</span><span class="copy-en">Essential function</span></h3><p class="copy-ko">언어 선택과 동의 상태를 기억하는 데 필요합니다. 비활성화할 수 없습니다.</p><p class="copy-en">Needed to remember language choice and consent state. It cannot be disabled.</p></div><button class="switch" type="button" aria-pressed="true" disabled><span class="sr-only">Always active</span></button></div>
+    <div class="cookie-row"><div><h3><span class="copy-ko">분석 쿠키 · Google Analytics</span><span class="copy-en">Analytics cookies · Google Analytics</span></h3><p class="copy-ko">방문 흐름을 익명·집계 방식으로 파악하도록 돕습니다. 동의 전에는 불러오지 않습니다.</p><p class="copy-en">Helps understand visit patterns in anonymized, aggregated form. It is not loaded before consent.</p></div><button id="analytics-toggle" class="switch" type="button" aria-pressed="false"><span class="sr-only">Toggle analytics cookies</span></button></div>
+    <div class="cookie-row"><div><h3><span class="copy-ko">마케팅 쿠키</span><span class="copy-en">Marketing cookies</span></h3><p class="copy-ko">이 사이트는 개인 맞춤 광고를 제공하지 않으며 마케팅 쿠키를 사용하지 않습니다.</p><p class="copy-en">This site does not provide personalized advertising and does not use marketing cookies.</p></div><button class="switch" type="button" aria-pressed="false" disabled><span class="sr-only">Always inactive</span></button></div>
+  </div>
+  <div class="cookie-actions"><button class="button" id="save-cookies" type="button"><span class="copy-ko">선택 저장</span><span class="copy-en">Save choices</span></button><button class="button" id="reject-cookies" type="button"><span class="copy-ko">분석 쿠키 거부</span><span class="copy-en">Reject analytics</span></button></div>
+  <p class="cookie-status" id="cookie-status" aria-live="polite"></p>
+  <h2><span class="copy-ko">자세히 알아보기</span><span class="copy-en">Learn more</span></h2>
+  <p class="copy-ko">Google 지도 임베드는 위치 정보를 제공하기 위한 별도 제3자 서비스입니다. Google 지도는 분석 동의와 별개로 각자의 서비스 조건 및 개인정보 처리방침을 적용할 수 있습니다. 자세한 내용은 <a href="/privacy/">개인정보 처리방침</a>을 확인하세요.</p>
+  <p class="copy-en">The embedded Google Map is a separate third-party service used for location information. Google Maps may apply its own terms and privacy policy independently of analytics consent. Read the <a href="/privacy/">Privacy Policy</a> for more information.</p>
+  <script is:inline>
+    const analyticsKey = "gatbawi-cookie-analytics";
+    const analyticsToggle = document.querySelector("#analytics-toggle");
+    const saveButton = document.querySelector("#save-cookies");
+    const rejectButton = document.querySelector("#reject-cookies");
+    const status = document.querySelector("#cookie-status");
+    let analyticsEnabled = window.localStorage.getItem(analyticsKey) === "true";
+
+    function renderChoice() {
+      analyticsToggle?.setAttribute("aria-pressed", String(analyticsEnabled));
+    }
+    function announce(messageKo, messageEn) {
+      if (!status) return;
+      status.dataset.ko = messageKo;
+      status.dataset.en = messageEn;
+      status.textContent = document.documentElement.dataset.language === "en" ? messageEn : messageKo;
+    }
+    analyticsToggle?.addEventListener("click", () => { analyticsEnabled = !analyticsEnabled; renderChoice(); });
+    saveButton?.addEventListener("click", () => {
+      window.localStorage.setItem(analyticsKey, String(analyticsEnabled));
+      if (analyticsEnabled) window.dispatchEvent(new Event("gatbawi:analytics-consent"));
+      announce("쿠키 선택을 저장했습니다.", "Your cookie choices have been saved.");
+    });
+    rejectButton?.addEventListener("click", () => {
+      analyticsEnabled = false;
+      window.localStorage.setItem(analyticsKey, "false");
+      renderChoice();
+      announce("분석 쿠키를 거부했습니다.", "Analytics cookies have been rejected.");
+    });
+    window.addEventListener("storage", renderChoice);
+    renderChoice();
+  </script>
+</PolicyPage>

@@ -1,0 +1,26 @@
+---
+/** Style note: Policy pages keep the editorial trail system but remove visual noise for sustained legal reading. */
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  titleKo: string;
+  titleEn: string;
+  introKo: string;
+  introEn: string;
+}
+
+const { titleKo, titleEn, introKo, introEn } = Astro.props;
+---
+
+<BaseLayout title={`${titleKo} | ${titleEn} | Gatbawi Visitor Guide`} description={introKo}>
+  <section class="policy-hero">
+    <div class="policy-hero-inner">
+      <p class="section-label"><span>00</span> SITE NOTE</p>
+      <h1><span class="copy-ko">{titleKo}</span><span class="copy-en">{titleEn}</span></h1>
+      <p class="copy-ko">{introKo}</p>
+      <p class="copy-en">{introEn}</p>
+      <a class="text-link" href="/"><span class="copy-ko">← 방문 안내로 돌아가기</span><span class="copy-en">← Return to visitor guide</span></a>
+    </div>
+  </section>
+  <section class="policy-content"><slot /></section>
+</BaseLayout>

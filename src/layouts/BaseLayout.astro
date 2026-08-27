@@ -1,0 +1,95 @@
+---
+/** Style note: A restrained Korean mountain-temple editorial shell using granite, rice-paper warmth and cinnabar wayfinding. */
+import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  noIndex?: boolean;
+}
+
+const {
+  title = "팔공산 갓바위 방문 안내 | Gatbawi Visitor Guide",
+  description = "팔공산 갓바위의 역사, 방문 준비, 교통과 현장 이용 정보를 한국어와 영어로 정리한 독립 비영리 안내입니다.",
+  noIndex = false
+} = Astro.props;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
+const ogImage = Astro.site
+  ? new URL("/images/gatbawi-wikimedia-real.webp", Astro.site).toString()
+  : undefined;
+const gaId = "G-HXM22WWPKP";
+---
+
+<!doctype html>
+<html lang="ko" data-language="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#b64a35" />
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-16.svg" sizes="16x16" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.svg" sizes="32x32" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">
+      <span class="copy-ko">본문으로 건너뛰기</span><span class="copy-en">Skip to content</span>
+    </a>
+    <SiteHeader />
+    <main id="main-content"><slot /></main>
+    <Footer />
+    <script is:inline define:vars={{ gaId }}>
+      const root = document.documentElement;
+      const languageButtons = document.querySelectorAll("[data-language-button]");
+      const localLanguage = window.localStorage.getItem("gatbawi-language");
+      const analyticsKey = "gatbawi-cookie-analytics";
+
+      function setLanguage(language) {
+        const isEnglish = language === "en";
+        root.lang = isEnglish ? "en" : "ko";
+        root.dataset.language = isEnglish ? "en" : "ko";
+        root.classList.toggle("lang-en", isEnglish);
+        document.querySelectorAll("[data-language-button]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.languageButton === language));
+        });
+        window.localStorage.setItem("gatbawi-language", language);
+      }
+
+      function loadAnalytics() {
+        if (window.__gatbawiAnalyticsLoaded) return;
+        window.__gatbawiAnalyticsLoaded = true;
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+        document.head.appendChild(script);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag("js", new Date());
+        gtag("config", gaId, { anonymize_ip: true });
+      }
+
+      setLanguage(localLanguage === "en" ? "en" : "ko");
+      languageButtons.forEach((button) => button.addEventListener("click", () => setLanguage(button.dataset.languageButton)));
+      if (window.localStorage.getItem(analyticsKey) === "true") loadAnalytics();
+      window.addEventListener("gatbawi:analytics-consent", () => loadAnalytics());
+    </script>
+  </body>
+</html>
