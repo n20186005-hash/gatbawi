@@ -7,12 +7,13 @@ interface Props {
   titleEn: string;
   introKo: string;
   introEn: string;
+  noIndex?: boolean;
 }
 
-const { titleKo, titleEn, introKo, introEn } = Astro.props;
+const { titleKo, titleEn, introKo, introEn, noIndex = false } = Astro.props;
 ---
 
-<BaseLayout title={`${titleKo} | ${titleEn} | Gatbawi Visitor Guide`} description={introKo}>
+<BaseLayout title={`${titleKo} | ${titleEn} | Gatbawi Visitor Guide`} description={introKo} noIndex={noIndex}>
   <section class="policy-hero">
     <div class="policy-hero-inner">
       <p class="section-label"><span>00</span> SITE NOTE</p>

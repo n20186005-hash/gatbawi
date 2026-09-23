@@ -1,0 +1,198 @@
+---
+import { getWeather, buildAdvice, wmo, msToBeaufort } from "../lib/weather";
+
+let data: any = null;
+let failed = false;
+try {
+  data = await getWeather();
+} catch {
+  failed = true;
+}
+
+const cur = data?.current ?? {};
+const daily = data?.daily ?? {};
+const times: string[] = daily.time ?? [];
+
+const WD_KO = ["일", "월", "화", "수", "목", "금", "토"];
+const WD_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const dailyRows = times.slice(0, 7).map((t: string, i: number) => {
+  const d = new Date(t + "T00:00:00");
+  const wd = d.getDay();
+  return {
+    i,
+    dateLabelKo: i === 0 ? "오늘" : i === 1 ? "내일" : `${d.getMonth() + 1}/${d.getDate()} (${WD_KO[wd]})`,
+    dateLabelEn: i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${d.getMonth() + 1}/${d.getDate()} (${WD_EN[wd]})`,
+    code: daily.weather_code?.[i] ?? 0,
+    max: daily.temperature_2m_max?.[i] ?? null,
+    min: daily.temperature_2m_min?.[i] ?? null,
+    pop: daily.precipitation_probability_max?.[i] ?? 0,
+    uv: daily.uv_index_max?.[i] ?? 0,
+  };
+});
+
+const advice = data ? buildAdvice(data) : { risk: [], outfit: [], plan: [], items: [] };
+---
+
+<section id="weather" class="weather-section" aria-labelledby="weather-title">
+  <div class="section-rail"><span>02-3</span><p class="copy-ko">2-3. 실시간 날씨</p><p class="copy-en">WEATHER · LIVE &amp; 7-DAY</p></div>
+  <div class="weather-inner">
+    <p class="section-label"><span>02-3</span> WEATHER · Gwanbong 850 m</p>
+    <h2 id="weather-title"><span class="copy-ko">산 정상을 위한<br /><em>실시간 날씨와 7일 전망</em></span><span class="copy-en">Current conditions &amp; 7-day outlook<br /><em>for the mountain peak</em></span></h2>
+    <p class="weather-lede copy-ko">출발 전날과 당일 아침, 돌계단 상태를 가르는 건 결국 날씨입니다. 현재 기온·강우 확률·바람을 확인하고, 우산이 필요한지 스스로 판단하세요.</p>
+    <p class="weather-lede copy-en">Trail and stair conditions change with the weather. Check live temperature, rain chance, and wind before you go, and decide for yourself whether an umbrella is worth bringing.</p>
+
+    {
+      failed ? (
+        <p class="weather-fallback">
+          <span class="copy-ko">현재 날씨 정보를 불러올 수 없습니다. 출발 전 기상청·공식 채널을 확인하세요.</span>
+          <span class="copy-en">Live weather is unavailable right now. Please check the official meteorological source before departure.</span>
+        </p>
+      ) : (
+        <div class="weather-grid">
+          <article class="weather-current" aria-label="현재 날씨 · current conditions">
+            <p class="weather-now-icon" data-w="cur.icon">{wmo(cur.weather_code ?? 0, "ko").icon}</p>
+            <p class="weather-now-temp"><span data-w="cur.temp">{cur.temperature_2m}</span><span class="unit">°C</span></p>
+            <p class="weather-now-desc"><span class="copy-ko" data-w="cur.desc.ko">{wmo(cur.weather_code ?? 0, "ko").ko}</span><span class="copy-en" data-w="cur.desc.en">{wmo(cur.weather_code ?? 0, "en").en}</span></p>
+            <dl class="weather-now-facts">
+              <div><dt><span class="copy-ko">체감</span><span class="copy-en">Feels</span></dt><dd><span data-w="cur.app">{cur.apparent_temperature}</span>°</dd></div>
+              <div><dt><span class="copy-ko">습도</span><span class="copy-en">Humidity</span></dt><dd><span data-w="cur.hum">{cur.relative_humidity_2m}</span>%</dd></div>
+              <div><dt><span class="copy-ko">바람</span><span class="copy-en">Wind</span></dt><dd data-w="cur.wind">{msToBeaufort(cur.wind_speed_10m ?? 0)}단계 / {Math.round((cur.wind_speed_10m ?? 0) * 3.6)}km/h</dd></div>
+              <div><dt><span class="copy-ko">강우</span><span class="copy-en">Precip</span></dt><dd><span data-w="cur.precip">{cur.precipitation ?? 0}</span>mm</dd></div>
+            </dl>
+          </article>
+
+          <div class="weather-days" role="list">
+            {dailyRows.map((row) => (
+              <article class="weather-day" role="listitem">
+                <p class="weather-day-date"><span class="copy-ko">{row.dateLabelKo}</span><span class="copy-en">{row.dateLabelEn}</span></p>
+                <p class="weather-day-icon" data-w={`day.${row.i}.icon`}>{wmo(row.code, "ko").icon}</p>
+                <p class="weather-day-desc"><span class="copy-ko" data-w={`day.${row.i}.desc.ko`}>{wmo(row.code, "ko").ko}</span><span class="copy-en" data-w={`day.${row.i}.desc.en`}>{wmo(row.code, "en").en}</span></p>
+                <p class="weather-day-temp"><span data-w={`day.${row.i}.max`}>{row.max}</span>° / <span data-w={`day.${row.i}.min`}>{row.min}</span>°</p>
+                <p class="weather-day-pop"><span class="copy-ko">강우</span><span class="copy-en">Rain</span> <span data-w={`day.${row.i}.pop`}>{row.pop}</span>%</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    {
+      !failed && (
+        <div class="weather-advice" id="weather-advice" aria-label="방문 조언 · visitor advice">
+          {
+            advice.risk.length > 0 ? (
+              <div class="weather-risk" role="alert">
+                <p class="weather-risk-label"><span class="copy-ko">위험 주의</span><span class="copy-en">Weather risk</span></p>
+                <ul class="weather-risk-list">
+                  {advice.risk.map((c) => (
+                    <li><span class="copy-ko">{c.ko}</span><span class="copy-en">{c.en}</span></li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p class="weather-safe"><span class="copy-ko">특별한 기상 위험은 보이지 않습니다. 산행 전 기상청을 한 번 더 확인하세요.</span><span class="copy-en">No special weather risk right now — still check the official forecast before you hike.</span></p>
+            )
+          }
+
+          <div class="weather-group">
+            <p class="weather-group-label"><span class="copy-ko">출행 코디</span><span class="copy-en">Travel outfit</span></p>
+            <ul class="weather-group-list">
+              {advice.outfit.map((c) => (
+                <li><span class="copy-ko">{c.ko}</span><span class="copy-en">{c.en}</span></li>
+              ))}
+            </ul>
+          </div>
+          <div class="weather-group">
+            <p class="weather-group-label"><span class="copy-ko">놀이 배치</span><span class="copy-en">Activity plan</span></p>
+            <ul class="weather-group-list">
+              {advice.plan.map((c) => (
+                <li><span class="copy-ko">{c.ko}</span><span class="copy-en">{c.en}</span></li>
+              ))}
+            </ul>
+          </div>
+          <div class="weather-group">
+            <p class="weather-group-label"><span class="copy-ko">휴대물품</span><span class="copy-en">What to bring</span></p>
+            <ul class="weather-group-list weather-group-items">
+              {advice.items.map((c) => (
+                <li><span class="copy-ko">{c.ko}</span><span class="copy-en">{c.en}</span></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  import { buildAdvice, wmo, msToBeaufort } from "../lib/weather";
+
+  function setText(attr: string, value: string) {
+    const el = document.querySelector(`[data-w="${attr}"]`);
+    if (el) el.textContent = value;
+  }
+
+  function groupHtml(labelKo: string, labelEn: string, arr: any[]): string {
+    if (!arr.length) return "";
+    const lis = arr
+      .map((c: any) => `<li><span class="copy-ko">${c.ko}</span><span class="copy-en">${c.en}</span></li>`)
+      .join("");
+    return `<div class="weather-group"><p class="weather-group-label"><span class="copy-ko">${labelKo}</span><span class="copy-en">${labelEn}</span></p><ul class="weather-group-list">${lis}</ul></div>`;
+  }
+
+  function renderAdvice(d: any) {
+    const box = document.getElementById("weather-advice");
+    if (!box) return;
+    const adv = buildAdvice(d);
+    const riskHtml = adv.risk.length
+      ? `<div class="weather-risk" role="alert"><p class="weather-risk-label"><span class="copy-ko">위험 주의</span><span class="copy-en">Weather risk</span></p><ul class="weather-risk-list">${adv.risk
+          .map((c: any) => `<li><span class="copy-ko">${c.ko}</span><span class="copy-en">${c.en}</span></li>`)
+          .join("")}</ul></div>`
+      : `<p class="weather-safe"><span class="copy-ko">특별한 기상 위험은 보이지 않습니다. 산행 전 기상청을 한 번 더 확인하세요.</span><span class="copy-en">No special weather risk right now — still check the official forecast before you hike.</span></p>`;
+    const itemsHtml = adv.items.length
+      ? `<div class="weather-group"><p class="weather-group-label"><span class="copy-ko">휴대물품</span><span class="copy-en">What to bring</span></p><ul class="weather-group-list weather-group-items">${adv.items
+          .map((c: any) => `<li><span class="copy-ko">${c.ko}</span><span class="copy-en">${c.en}</span></li>`)
+          .join("")}</ul></div>`
+      : "";
+    box.innerHTML =
+      riskHtml +
+      groupHtml("출행 코디", "Travel outfit", adv.outfit) +
+      groupHtml("놀이 배치", "Activity plan", adv.plan) +
+      itemsHtml;
+  }
+
+  async function refreshWeather() {
+    try {
+      const res = await fetch("/api/weather");
+      if (!res.ok) return;
+      const d = await res.json();
+      const cur = d.current ?? {};
+      const daily = d.daily ?? {};
+      const w = wmo(cur.weather_code ?? 0, "ko");
+      setText("cur.icon", w.icon);
+      setText("cur.temp", String(cur.temperature_2m ?? ""));
+      setText("cur.desc.ko", w.ko);
+      setText("cur.desc.en", wmo(cur.weather_code ?? 0, "en").en);
+      setText("cur.app", String(cur.apparent_temperature ?? ""));
+      setText("cur.hum", String(cur.relative_humidity_2m ?? ""));
+      setText("cur.wind", `${msToBeaufort(cur.wind_speed_10m ?? 0)}단계 / ${Math.round((cur.wind_speed_10m ?? 0) * 3.6)}km/h`);
+      setText("cur.precip", String(cur.precipitation ?? 0));
+      (daily.time ?? []).slice(0, 7).forEach((_: string, i: number) => {
+        const code = daily.weather_code?.[i] ?? 0;
+        setText(`day.${i}.icon`, wmo(code, "ko").icon);
+        setText(`day.${i}.desc.ko`, wmo(code, "ko").ko);
+        setText(`day.${i}.desc.en`, wmo(code, "en").en);
+        setText(`day.${i}.max`, String(daily.temperature_2m_max?.[i] ?? ""));
+        setText(`day.${i}.min`, String(daily.temperature_2m_min?.[i] ?? ""));
+        setText(`day.${i}.pop`, String(daily.precipitation_probability_max?.[i] ?? 0));
+      });
+      renderAdvice(d);
+    } catch {
+      /* keep server-rendered values on failure */
+    }
+  }
+
+  refreshWeather();
+  setInterval(refreshWeather, 10 * 60 * 1000);
+</script>

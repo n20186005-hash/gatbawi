@@ -9,7 +9,7 @@
     "build": "DEPLOY_TARGET=cloudflare astro build",
     "preview": "DEPLOY_TARGET=cloudflare astro preview --host 0.0.0.0",
     "check": "astro check",
-    "deploy": "pnpm build && wrangler deploy --config ./wrangler.worker.toml ./dist/_worker.js/index.js"
+    "deploy": "pnpm build && wrangler deploy --config ./wrangler.worker.toml"
   },
   "engines": {
     "node": "22.13.0"

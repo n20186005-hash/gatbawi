@@ -1,12 +1,18 @@
 {
   "name": "팔공산 갓바위 방문 안내",
   "short_name": "갓바위 안내",
+  "description": "Gatbawi (팔공산 갓바위) — Palgongsan Stone Medicine Buddha visitor guide in Daegu, South Korea.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#b64a35",
   "icons": [
     { "src": "/favicon-16.svg", "sizes": "16x16", "type": "image/svg+xml" },
     { "src": "/favicon-32.svg", "sizes": "32x32", "type": "image/svg+xml" },
-    { "src": "/apple-touch-icon.svg", "sizes": "180x180", "type": "image/svg+xml" }
-  ],
-  "theme_color": "#b64a35",
-  "background_color": "#f6f1e7",
-  "display": "standalone"
+    { "src": "/apple-touch-icon.svg", "sizes": "180x180", "type": "image/svg+xml" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

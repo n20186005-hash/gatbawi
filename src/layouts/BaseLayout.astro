@@ -3,6 +3,7 @@
 import "../styles/global.css";
 import Footer from "../components/Footer.astro";
 import SiteHeader from "../components/SiteHeader.astro";
+import { SITE_NAME } from "../data/site";
 
 interface Props {
   title?: string;
@@ -11,8 +12,8 @@ interface Props {
 }
 
 const {
-  title = "Gatbawi (팔공산 갓바위) Guide — Stone Medicine Buddha in Palgongsan, Daegu",
-  description = "Gatbawi (팔공산 갓바위, 관봉석조여래좌상) — 4.6★ / 4,632 Google 리뷰. 대구광역시 동구 갓바위로 229, 팔공산 국립공원 관봉(해발 850m)에 자리한 통일신라 시대 석조 약사여래좌상. 소원 성취 불상으로 알려진 산중 문화유산 방문·등산·교통 안내. / 4.6★ / 4,632 Google reviews. Unified Silla era Stone Seated Medicine Buddha at 850 m Gwanbong Peak, Palgongsan National Park, 229 Gatbawi-ro, Dong-gu, Daegu. Wish-granting Buddha hiking, Daegu day trip & visitor guide.",
+  title = SITE_NAME,
+  description = "갓바위 (팔공산 갓바위, 관봉석조여래좌상) — 대구광역시 동구 갓바위로 229, 팔공산 국립공원 관봉(해발 850m)에 자리한 통일신라 시대 석조 약사여래좌상. 위치·교통·실시간 날씨·계절 전략·방문 팁을 정리한 비영리 안내. / Gatbawi (Palgongsan Stone Medicine Buddha) — independent, nonprofit visitor guide to Daegu with location, transport, live weather, seasonal strategy and practical tips.",
   noIndex = false
 } = Astro.props;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
@@ -32,6 +33,7 @@ const gaId = "G-HXM22WWPKP";
     {canonical && <link rel="canonical" href={canonical} />}
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
@@ -44,6 +46,10 @@ const gaId = "G-HXM22WWPKP";
     <link rel="icon" href="/favicon-32.svg" sizes="32x32" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="갓바위 안내" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet" />
@@ -90,6 +96,13 @@ const gaId = "G-HXM22WWPKP";
       languageButtons.forEach((button) => button.addEventListener("click", () => setLanguage(button.dataset.languageButton)));
       if (window.localStorage.getItem(analyticsKey) === "true") loadAnalytics();
       window.addEventListener("gatbawi:analytics-consent", () => loadAnalytics());
+    </script>
+    <script is:inline>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(() => {});
+        });
+      }
     </script>
   </body>
 </html>

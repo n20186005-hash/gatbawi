@@ -3,8 +3,9 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
-// The only canonical site URL configuration point. Leave SITE_URL unset until a real domain is chosen.
-const site = process.env.SITE_URL || undefined;
+// Canonical site URL. Defaults to the production domain so canonical tags, absolute
+// OG URLs, the XML sitemap, and JSON-LD url/image are always emitted. Override with SITE_URL.
+const site = process.env.SITE_URL || "https://gatbawi.com";
 const isWorkerBuild = process.env.DEPLOY_TARGET === "cloudflare";
 
 export default defineConfig({

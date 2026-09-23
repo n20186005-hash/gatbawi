@@ -1,7 +1,8 @@
 name = "gatbawi-guide"
 compatibility_date = "2026-08-27"
 compatibility_flags = ["nodejs_compat"]
+main = "./dist/server/entry.mjs"
 
 [assets]
-directory = "./dist"
+directory = "./dist/client"
 binding = "ASSETS"
