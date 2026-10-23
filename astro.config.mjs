@@ -13,7 +13,7 @@ export default defineConfig({
   output: isWorkerBuild ? "server" : "static",
   server: { host: true, port: 3000 },
   adapter: isWorkerBuild ? cloudflare() : undefined,
-  integrations: site ? [sitemap()] : [],
+  integrations: site ? [sitemap({ customPages: ["/", "/en/", "/cookies/", "/en/cookies/"].map(path => new URL(path, site).href), filter: page => !page.includes("/privacy") && !page.includes("/terms") && !page.includes("404") })] : [],
   vite: {
     plugins: [tailwindcss()],
     server: { allowedHosts: true }

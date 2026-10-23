@@ -18,7 +18,8 @@
   "dependencies": {
     "@astrojs/cloudflare": "14.2.5",
     "@astrojs/sitemap": "3.7.3",
-    "astro": "7.2.8"
+    "astro": "7.2.8",
+    "parse5": "8.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

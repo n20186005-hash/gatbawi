@@ -1,7 +1,8 @@
 // Weather helper for Gatbawi (Palgongsan, Daegu). Server-side fetch + edge caching; no API key required.
 // This module is import-safe on both the server and the client (no top-level side effects).
 
-export const GATBAWI = { lat: 35.9814948, lon: 128.7367522 };
+// Approximate map-code area, not surveyed summit coordinates.
+export const GATBAWI = { lat: 35.9815, lon: 128.7368 };
 
 export type Lang = "ko" | "en";
 
@@ -43,7 +44,7 @@ export const WMO: Record<number, WmoEntry> = {
   99: { ko: "강한 우박 뇌우", en: "Severe thunderstorm", icon: "⛈" },
 };
 
-export function wmo(code: number, lang: Lang): WmoEntry {
+export function wmo(code: number, _lang: Lang): WmoEntry {
   return WMO[code] ?? { ko: "알 수 없음", en: "Unknown", icon: "🌡" };
 }
 
@@ -199,23 +200,20 @@ export function buildAdvice(d: any): WeatherAdvice {
 
 /**
  * Fetch forecast. On Cloudflare Workers the response is cached at the edge for ~10 minutes
- * via the Cache API; elsewhere it falls back to a direct fetch. Never throws to the caller.
+ * via the Cache API; elsewhere it falls back to a direct fetch. Throws on unavailable or malformed forecasts; callers render an unavailable state.
  */
+export function validateWeather(data: any): void {
+ const cur=data?.current, daily=data?.daily;
+ const currentFields=['temperature_2m','relative_humidity_2m','apparent_temperature','precipitation','weather_code','wind_speed_10m','wind_direction_10m'];
+ const dailyFields=['weather_code','temperature_2m_max','temperature_2m_min','precipitation_probability_max','wind_speed_10m_max','uv_index_max'];
+ if (!cur || !daily || !currentFields.every(k=>typeof cur[k]==='number'&&Number.isFinite(cur[k])) || typeof cur.time!=='string' || !Number.isFinite(Date.parse(cur.time+'+09:00')) || !Array.isArray(daily.time) || daily.time.length!==7 || !daily.time.every((v:any)=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))) || !dailyFields.every(k=>Array.isArray(daily[k])&&daily[k].length===7&&daily[k].every((v:any)=>typeof v==='number'&&Number.isFinite(v)))) throw Error('weather_invalid');
+}
 export async function getWeather(): Promise<any> {
-  const url = weatherUrl();
-  const cache: any = (globalThis as any).caches?.default;
-  if (cache) {
-    const hit = await cache.match(url);
-    if (hit) return hit.json();
-  }
-  const res = await fetch(url, { cf: { cacheTtl: 600 } } as any);
-  if (!res.ok) throw new Error("weather_fetch_failed");
-  const data = await res.json();
-  if (cache) {
-    const put = new Response(JSON.stringify(data), {
-      headers: { "content-type": "application/json", "cache-control": "public, max-age=600" },
-    });
-    await cache.put(url, put);
-  }
-  return data;
+ const url=weatherUrl(),cache: any=(globalThis as any).caches?.default;
+ if(cache){try{const hit=await cache.match(url);if(hit){const data=await hit.json();validateWeather(data);return data;}}catch{}}
+ const res=await fetch(url,{signal:AbortSignal.timeout(4000)});
+ if(!res.ok)throw Error('weather_fetch_failed');
+ const data=await res.json();validateWeather(data);
+ if(cache){try{await cache.put(url,Response.json(data,{headers:{'Cache-Control':'public,max-age=600'}}));}catch{}}
+ return data;
 }

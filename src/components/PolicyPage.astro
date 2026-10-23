@@ -10,10 +10,11 @@ interface Props {
   noIndex?: boolean;
 }
 
+const lang = Astro.url.pathname.startsWith("/en/") ? "en" : "ko";
 const { titleKo, titleEn, introKo, introEn, noIndex = false } = Astro.props;
 ---
 
-<BaseLayout title={`${titleKo} | ${titleEn} | Gatbawi Visitor Guide`} description={introKo} noIndex={noIndex}>
+<BaseLayout title={`${lang === "en" ? titleEn : titleKo} | Gatbawi Visitor Guide`} description={lang === "en" ? introEn : introKo} noIndex={noIndex}>
   <section class="policy-hero">
     <div class="policy-hero-inner">
       <p class="section-label"><span>00</span> SITE NOTE</p>

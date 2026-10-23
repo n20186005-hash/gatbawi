@@ -22,8 +22,8 @@ export const ATTRACTION = {
   countryKo: "대한민국",
   countryCode: "KR",
   postalCode: "41025",
-  lat: 35.9814948,
-  lon: 128.7367522,
+  lat: 35.9815,
+  lon: 128.7368,
   elevation: "850 m",
   peak: "Gwanbong Peak (관봉, 冠峰)",
   address: "229 Gatbawi-ro, Dong-gu, Daegu, 41025, Republic of Korea",
@@ -32,13 +32,13 @@ export const ATTRACTION = {
   mapsEmbedSrc:
     "https://www.google.com/maps/embed?pb=!1m5!3m3!1m2!1s0x356676b2c477a469%3A0x5ebd8eac7aea231d!2sGatbawi!5e1!3m2!1sen!2s!4v1787535670848!5m2!1sen!2s",
   rating: 4.6,
-  reviewCount: 4636,
+  reviewCount: 4649,
 } as const;
 
 /** Authoritative, non-commercial outbound references (government / public / encyclopedic only). */
 export const REFERENCES = [
   { label: "Gatbawi on Wikipedia", url: "https://en.wikipedia.org/wiki/Gatbawi" },
-  { label: "Wikidata · Q12583597", url: "https://www.wikidata.org/wiki/Q12583597" },
+  { label: "Wikidata · Q5526956", url: "https://www.wikidata.org/wiki/Q5526956" },
   { label: "Korea Tourism Organization (VisitKorea)", url: "https://english.visitkorea.or.kr/" },
   { label: "Daegu Metropolitan City Tourism", url: "https://tour.daegu.go.kr" },
   { label: "Korea National Park Service (Palgongsan)", url: "https://www.knps.or.kr" },

@@ -11,26 +11,28 @@ interface Props {
   noIndex?: boolean;
 }
 
+const lang = Astro.url.pathname.startsWith("/en/") ? "en" : "ko";
+const topic = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
 const {
   title = SITE_NAME,
-  description = "갓바위 (팔공산 갓바위, 관봉석조여래좌상) — 대구광역시 동구 갓바위로 229, 팔공산 국립공원 관봉(해발 850m)에 자리한 통일신라 시대 석조 약사여래좌상. 위치·교통·실시간 날씨·계절 전략·방문 팁을 정리한 비영리 안내. / Gatbawi (Palgongsan Stone Medicine Buddha) — independent, nonprofit visitor guide to Daegu with location, transport, live weather, seasonal strategy and practical tips.",
+  description = lang === "en" ? "Visit Palgongsan Gatbawi: understand the stone Buddha, compare Daegu and Gyeongsan approaches, and check access, weather and respectful visiting advice." : "팔공산 갓바위 석불의 의미, 대구·경산 접근로, 입산 확인사항과 날씨·방문 예절을 정리한 독립 안내입니다.",
   noIndex = false
 } = Astro.props;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 const ogImage = Astro.site
   ? new URL("/images/gatbawi-wikimedia-real.webp", Astro.site).toString()
   : undefined;
-const gaId = "G-HXM22WWPKP";
 ---
 
 <!doctype html>
-<html lang="ko" data-language="ko">
+<html lang={lang} data-language={lang} class:list={{"lang-en": lang === "en"}}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#b64a35" />
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
+    {Astro.site && <><link rel="alternate" hreflang="ko" href={new URL(topic, Astro.site).href} /><link rel="alternate" hreflang="en" href={new URL(topic === "/" ? "/en/" : `/en${topic}`, Astro.site).href} /><link rel="alternate" hreflang="x-default" href={new URL(topic, Astro.site).href} /></>}
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_NAME} />
@@ -38,8 +40,9 @@ const gaId = "G-HXM22WWPKP";
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta property="og:locale" content="ko_KR" />
-    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale" content={lang === "en" ? "en_US" : "ko_KR"} />
+    <meta property="og:locale:alternate" content={lang === "en" ? "ko_KR" : "en_US"} />
+    <meta property="og:image:alt" content="Gatbawi Buddha photographed by Barnkim in 2007; historical image" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-16.svg" sizes="16x16" type="image/svg+xml" />
@@ -62,41 +65,7 @@ const gaId = "G-HXM22WWPKP";
     <SiteHeader />
     <main id="main-content"><slot /></main>
     <Footer />
-    <script is:inline define:vars={{ gaId }}>
-      const root = document.documentElement;
-      const languageButtons = document.querySelectorAll("[data-language-button]");
-      const localLanguage = window.localStorage.getItem("gatbawi-language");
-      const analyticsKey = "gatbawi-cookie-analytics";
-
-      function setLanguage(language) {
-        const isEnglish = language === "en";
-        root.lang = isEnglish ? "en" : "ko";
-        root.dataset.language = isEnglish ? "en" : "ko";
-        root.classList.toggle("lang-en", isEnglish);
-        document.querySelectorAll("[data-language-button]").forEach((button) => {
-          button.setAttribute("aria-pressed", String(button.dataset.languageButton === language));
-        });
-        window.localStorage.setItem("gatbawi-language", language);
-      }
-
-      function loadAnalytics() {
-        if (window.__gatbawiAnalyticsLoaded) return;
-        window.__gatbawiAnalyticsLoaded = true;
-        const script = document.createElement("script");
-        script.async = true;
-        script.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
-        document.head.appendChild(script);
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){window.dataLayer.push(arguments);}
-        gtag("js", new Date());
-        gtag("config", gaId, { anonymize_ip: true });
-      }
-
-      setLanguage(localLanguage === "en" ? "en" : "ko");
-      languageButtons.forEach((button) => button.addEventListener("click", () => setLanguage(button.dataset.languageButton)));
-      if (window.localStorage.getItem(analyticsKey) === "true") loadAnalytics();
-      window.addEventListener("gatbawi:analytics-consent", () => loadAnalytics());
-    </script>
+    <script is:inline src="/analytics.js"></script>
     <script is:inline>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
