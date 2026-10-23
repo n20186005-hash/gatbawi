@@ -1,7 +1,7 @@
 name = "gatbawi"
 compatibility_date = "2026-08-27"
 compatibility_flags = ["nodejs_compat"]
-main = "./dist/server/entry.mjs"
+main = "./src/worker.js"
 
 [assets]
 directory = "./dist/client"

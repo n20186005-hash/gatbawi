@@ -1,0 +1,13 @@
+import astroWorker from '../dist/server/entry.mjs';
+
+// Run before the adapter's static-asset fast path, which bypasses middleware.
+export default {
+  fetch(request, env, context) {
+    const url = new URL(request.url);
+    if (url.hostname === 'gatbawi.com' && url.protocol === 'http:') {
+      url.protocol = 'https:';
+      return Response.redirect(url.href, 308);
+    }
+    return astroWorker.fetch(request, env, context);
+  },
+};
