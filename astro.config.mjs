@@ -12,7 +12,7 @@ export default defineConfig({
   site,
   output: isWorkerBuild ? "server" : "static",
   server: { host: true, port: 3000 },
-  adapter: isWorkerBuild ? cloudflare() : undefined,
+  adapter: isWorkerBuild ? cloudflare({ configPath: "./wrangler.worker.toml" }) : undefined,
   integrations: site ? [sitemap({ customPages: ["/", "/en/", "/cookies/", "/en/cookies/"].map(path => new URL(path, site).href), filter: page => !page.includes("/privacy") && !page.includes("/terms") && !page.includes("404") })] : [],
   vite: {
     plugins: [tailwindcss()],

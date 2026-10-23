@@ -1,4 +1,4 @@
-import astroWorker from '../dist/server/entry.mjs';
+import astroWorker from '@astrojs/cloudflare/entrypoints/server';
 
 // Run before the adapter's static-asset fast path, which bypasses middleware.
 export default {
