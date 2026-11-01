@@ -2,6 +2,7 @@
 /** Style note: This page follows the “mountain prayer stone” editorial route: granite matter, quiet ascent, cinnabar coordinates, and bilingual factual wayfinding. */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WeatherSection from "../components/WeatherSection.astro";
+import TopicLinks from "../components/TopicLinks.astro";
 
 const lang = Astro.url.pathname.startsWith("/en/") ? "en" : "ko";
 const faqItems = [
@@ -411,6 +412,8 @@ const faqSchema = {
       <article class="nearby-card"><span class="nearby-number">03</span><h3><span class="copy-ko">대구 동부의 생활 문화</span><span class="copy-en">Eastern Daegu local culture</span></h3><p class="copy-ko">하산 뒤에는 대구 동부의 공공 문화 공간이나 일반 식당가를 동선에 맞게 살펴볼 수 있습니다. 귀가 교통과 충분한 휴식을 먼저 고려하세요.</p><p class="copy-en">After descending, consider public cultural spaces or general dining areas in eastern Daegu according to your route. Give return transport and sufficient rest priority.</p></article>
     </div>
   </section>
+
+  <TopicLinks />
 
   <section class="section faq-section" aria-labelledby="faq-title">
     <div class="section-rail"><span>03-3</span><p class="copy-ko">3-3. 자주 묻는 질문</p><p class="copy-en">FAQ · VISITOR Q&amp;A</p></div>

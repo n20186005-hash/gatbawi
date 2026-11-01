@@ -1,0 +1,44 @@
+---
+import { GROUP_ORDER, GROUP_META, topicsByGroup } from "../data/topics";
+---
+
+<div class="topic-links" id="guides">
+  <h2 class="topic-links-heading">
+    <span class="copy-ko">갓바위 주제별 안내</span>
+    <span class="copy-en">Gatbawi guides by topic</span>
+  </h2>
+  <p class="topic-links-intro">
+    <span class="copy-ko"
+      >대구 측과 경산 측을 구분하고, 접근·동선·날씨·방문 예절을 주제별로 정리했습니다.</span
+    >
+    <span class="copy-en"
+      >Separate Daegu and Gyeongsan approaches, with access, routes, weather, and
+      respectful visiting advice organised by topic.</span
+    >
+  </p>
+
+  {
+    GROUP_ORDER.map((gid) => {
+      const meta = GROUP_META[gid];
+      const topics = topicsByGroup(gid);
+      return (
+        <section class="topic-links-group">
+          <h3>
+            <span class="copy-ko">{meta.titleKo}</span>
+            <span class="copy-en">{meta.titleEn}</span>
+          </h3>
+          <ul class="topic-links-list">
+            {topics.map((t) => (
+              <li>
+                <a href={`/${t.slug}/`}>
+                  <span class="copy-ko">{t.ko.h1}</span>
+                  <span class="copy-en">{t.en.h1}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      );
+    })
+  }
+</div>

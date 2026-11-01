@@ -1,0 +1,38 @@
+---
+import TopicPage from "../components/TopicPage.astro";
+import GroupIndex from "../components/GroupIndex.astro";
+import {
+  getTopic,
+  isGroupSlug,
+  getGroup,
+  topicsByGroup,
+  topicSlugs,
+  GROUP_ORDER,
+} from "../data/topics";
+
+export function getStaticPaths() {
+  const paths: { params: { slug: string } }[] = [];
+  for (const gid of GROUP_ORDER) {
+    paths.push({ params: { slug: gid } });
+  }
+  for (const slug of topicSlugs()) {
+    paths.push({ params: { slug } });
+  }
+  return paths;
+}
+
+const slug = Astro.params.slug as string;
+const groupMeta = isGroupSlug(slug) ? getGroup(slug) : undefined;
+const groupTopics = groupMeta ? topicsByGroup(groupMeta.key) : [];
+const topic = getTopic(slug);
+---
+
+{
+  groupMeta ? (
+    <GroupIndex group={groupMeta} topics={groupTopics} />
+  ) : topic ? (
+    <TopicPage topic={topic} />
+  ) : (
+    <p>Not found</p>
+  )
+}

@@ -1,0 +1,151 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import type { Topic } from "../data/topics";
+import { getGroup, getTopic } from "../data/topics";
+
+interface Props {
+  topic: Topic;
+}
+
+const { topic } = Astro.props;
+const isEn = Astro.url.pathname.startsWith("/en/");
+const lang = isEn ? "en" : "ko";
+const content = isEn ? topic.en : topic.ko;
+const group = getGroup(topic.group);
+if (!group) throw new Error(`Unknown group ${topic.group}`);
+
+const title = content.metaTitle;
+const description = content.metaDescription;
+
+const homePath = "/";
+const groupPath = `/${topic.group}/`;
+const topicPath = `/${topic.slug}/`;
+
+const relatedTopics = topic.related
+  .map((s) => getTopic(s))
+  .filter((t): t is Topic => Boolean(t));
+
+const site = Astro.site?.href ?? "https://gatbawi.com/";
+const bcHome = new URL(homePath, site).href;
+const bcGroup = new URL(groupPath, site).href;
+const bcTopic = new URL(topicPath, site).href;
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: content.faqs.map((f) => ({
+    "@type": "Question",
+    name: isEn ? f.qEn : f.qKo,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: isEn ? f.aEn : f.aKo,
+    },
+  })),
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: isEn ? "Home" : "홈", item: bcHome },
+    { "@type": "ListItem", position: 2, name: isEn ? group.titleEn : group.titleKo, item: bcGroup },
+    { "@type": "ListItem", position: 3, name: content.h1, item: bcTopic },
+  ],
+};
+
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: content.h1,
+  description,
+  url: bcTopic,
+  inLanguage: isEn ? "en" : "ko-KR",
+  breadcrumb: breadcrumbLd,
+};
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="topic-page">
+    <nav class="topic-breadcrumb" aria-label={isEn ? "Breadcrumb" : "위치 경로"}>
+      <a href={homePath}>{isEn ? "Home" : "홈"}</a>
+      <span aria-hidden="true">/</span>
+      <a href={groupPath}>{isEn ? group.titleEn : group.titleKo}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{content.h1}</span>
+    </nav>
+
+    <header class="topic-hero">
+      <p class="topic-kicker">{isEn ? group.titleEn : group.titleKo}</p>
+      <h1>{content.h1}</h1>
+      <p class="topic-lead">{isEn ? content.leadEn : content.leadKo}</p>
+      <p class="topic-updated">
+        {isEn ? "Last updated " : "최종 확인 "}{content.updated}
+      </p>
+    </header>
+
+    <div class="topic-sections">
+      {
+        content.sections.map((s) => (
+          <section class="topic-section" id={s.id}>
+            <h2>{isEn ? s.headingEn : s.headingKo}</h2>
+            {(isEn ? s.paragraphsEn : s.paragraphsKo)?.map((p) => (
+              <p>{p}</p>
+            ))}
+            {(isEn ? s.bulletsEn : s.bulletsKo)?.length ? (
+              <ul class="topic-bullets">
+                {(isEn ? s.bulletsEn : s.bulletsKo)!.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            ) : null}
+            {(isEn ? s.calloutEn : s.calloutKo) && (
+              <p class="topic-callout">
+                {isEn ? s.calloutEn : s.calloutKo}
+              </p>
+            )}
+          </section>
+        ))
+      }
+    </div>
+
+    <section class="topic-faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">{isEn ? "Frequently asked questions" : "자주 묻는 질문"}</h2>
+      {
+        content.faqs.map((f) => (
+          <details class="topic-faq-item">
+            <summary>{isEn ? f.qEn : f.qKo}</summary>
+            <p>{isEn ? f.aEn : f.aKo}</p>
+          </details>
+        ))
+      }
+    </section>
+
+    {
+      relatedTopics.length > 0 && (
+        <section class="topic-related" aria-labelledby="related-heading">
+          <h2 id="related-heading">{isEn ? "Related guides" : "관련 안내"}</h2>
+          <ul class="topic-related-list">
+            {relatedTopics.map((t) => {
+              const tg = getGroup(t.group);
+              return (
+                <li>
+                  <a href={`/${t.slug}/`}>
+                    <span class="topic-related-title">
+                      {isEn ? t.en.h1 : t.ko.h1}
+                    </span>
+                    <span class="topic-related-meta">
+                      {isEn ? tg?.titleEn : tg?.titleKo}
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )
+    }
+
+    <script type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  </article>
+</BaseLayout>

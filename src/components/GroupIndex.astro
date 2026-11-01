@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../data/site";
+import type { GroupMeta, Topic } from "../data/topics";
+
+interface Props {
+  group: GroupMeta;
+  topics: Topic[];
+}
+
+const { group, topics } = Astro.props;
+const isEn = Astro.url.pathname.startsWith("/en/");
+
+const title = isEn
+  ? `${group.titleEn} | Gatbawi Daegu Travel Guide`
+  : `${group.titleKo} | ${SITE_NAME}`;
+const description = isEn ? group.introEn : group.introKo;
+
+const site = Astro.site?.href ?? "https://gatbawi.com/";
+const homePath = "/";
+const groupPath = `/${group.key}/`;
+const bcHome = new URL(homePath, site).href;
+const bcGroup = new URL(groupPath, site).href;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: isEn ? "Home" : "홈", item: bcHome },
+    { "@type": "ListItem", position: 2, name: isEn ? group.titleEn : group.titleKo, item: bcGroup },
+  ],
+};
+
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: isEn ? group.titleEn : group.titleKo,
+  description,
+  url: bcGroup,
+  inLanguage: isEn ? "en" : "ko-KR",
+  breadcrumb: breadcrumbLd,
+};
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="group-page">
+    <nav class="topic-breadcrumb" aria-label={isEn ? "Breadcrumb" : "위치 경로"}>
+      <a href={homePath}>{isEn ? "Home" : "홈"}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{isEn ? group.titleEn : group.titleKo}</span>
+    </nav>
+
+    <header class="topic-hero">
+      <p class="topic-kicker">{isEn ? "Gatbawi guide" : "갓바위 안내"}</p>
+      <h1>{isEn ? group.titleEn : group.titleKo}</h1>
+      <p class="topic-lead">{isEn ? group.introEn : group.introKo}</p>
+    </header>
+
+    <ul class="group-index-list">
+      {
+        topics.map((t) => (
+          <li>
+            <a href={`/${t.slug}/`}>
+              <span class="group-index-title">{isEn ? t.en.h1 : t.ko.h1}</span>
+              <span class="group-index-desc">
+                {isEn ? t.en.metaDescription : t.ko.metaDescription}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
+  </article>
+</BaseLayout>
