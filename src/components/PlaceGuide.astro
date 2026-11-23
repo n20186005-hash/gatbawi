@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import places from "../data/places.json";
+interface Props { place: typeof places[number]; lang: "en" | "ko" }
+const { place, lang } = Astro.props;
+const en = lang === "en";
+const t = place[lang];
+const map = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(place.ko.name + " " + place.ko.address);
+const directions = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(place.ko.name + " " + place.ko.address);
+const prefix = en ? "/en" : "";
+const district = place.ko.address.split(" ")[1];
+const neighbours = places.filter(p => p.slug !== place.slug && p.ko.address.includes(district)).slice(0,3);
+---
+<BaseLayout title={en ? t.name + " – visitor guide from Gatbawi, Daegu" : t.name + " 방문 안내 · 대구 갓바위 주변 여행"} description={t.background}>
+<article class="place-guide">
+  <header class="place-hero">
+    <div class="place-caption"><a href={prefix + "/#nearby-places"}>{en ? "Explore from Gatbawi" : "갓바위 주변 여행"}</a><h1>{t.name}</h1><p>{t.address}</p><a class="button" href={map}>{en ? "Find " + t.name + " on Google Maps" : t.name + " 지도 보기"}</a></div>
+    <figure><img src={place.photo} alt={t.name} width="900" height="600"/><figcaption><a href={place.source}>{en ? "Photo via VisitKorea" : "사진 출처 · 한국관광공사"}</a></figcaption></figure>
+  </header>
+  <div class="place-body">
+    <section><h2>{en ? "About the site and its management" : "장소의 역사와 관리"}</h2><p>{t.background}</p><p><strong>{en ? "Management and visitor enquiries" : "관리·이용 문의"}</strong> · {place.ownerSource ? <a href={place.ownerSource}>{t.manager}</a> : t.manager}</p></section>
+    <section><h2>{en ? "Walking route and photography" : "걷는 순서와 촬영 지점"}</h2><p>{t.walk}</p></section>
+    <section><h2>{en ? "Plan your visit" : "방문 준비"}</h2><dl><dt>{en ? "Opening times" : "이용 시간"}</dt><dd>{t.hours}</dd><dt>{en ? "Address" : "주소"}</dt><dd>{t.address}</dd><dt>{en ? "Transport" : "교통편"}</dt><dd><a href={directions}>{en ? "Plan a route to " + t.name : t.name + "까지 이동 경로 찾기"}</a></dd></dl></section>
+    <section><h2>{en ? "Visitor questions" : "방문 전 질문"}</h2><details><summary>{en ? "Where can I check admission and holiday opening?" : "입장 조건과 휴무일은 어디에서 확인하나요?"}</summary><p><a href={place.source}>{en ? t.name + " on VisitKorea" : "한국관광공사 " + t.name + " 안내"}</a> · {en ? "Use the enquiry details for this destination before setting out." : "출발 전 해당 장소의 문의처와 휴무 안내를 확인하세요."}</p></details></section>
+    {neighbours.length > 0 && <section><h2>{en ? "Explore the same district" : "같은 지역에서 이어 보기"}</h2><ul>{neighbours.map(p => <li><a href={prefix + "/places/" + p.slug + "/"}>{p[lang].name}</a></li>)}</ul></section>}
+  </div>
+</article>
+</BaseLayout>
+<style>
+.place-hero{display:grid;grid-template-columns:1fr 1fr;background:var(--pine);color:var(--paper);align-items:center}
+.place-caption{padding:clamp(1.5rem,5vw,6rem)}h1,h2{font-family:var(--display-ko);line-height:1.15}html[lang=en] h1,html[lang=en] h2{font-family:var(--display-en)}
+h1{font-size:clamp(2.3rem,5.4vw,5.5rem);margin:1rem 0}.place-caption>.button{background:var(--paper);color:var(--pine);margin-top:1rem}
+figure{position:relative;margin:0}figure img{width:100%;height:clamp(19rem,40vw,34rem);object-fit:cover;display:block}
+figcaption{position:absolute;bottom:.6rem;right:.6rem;background:#19241fe8;color:white;padding:.2rem .6rem;font-size:.8rem}
+.place-body{max-width:61rem;margin:auto;padding:1rem clamp(1.25rem,4vw,4rem) 5rem}.place-body section{padding:2rem 0;border-bottom:1px solid var(--line)}h2{font-size:clamp(1.6rem,3vw,2.3rem);color:var(--pine)}
+p,dd{max-width:68ch}.place-body a{text-decoration:underline;text-underline-offset:.22em;color:var(--cinnabar-dark)}dl{display:grid;grid-template-columns: minmax(6rem,.3fr) 1fr;gap:.6rem}dd{margin:0}summary{cursor:pointer;font-weight:600}.place-body ul{display:flex;flex-wrap:wrap;gap:1.5rem;padding:0;list-style:none}
+@media(max-width:680px){.place-hero{grid-template-columns:1fr}figure img{height:15rem}dl{display:block}dd{margin-bottom:.65rem}}
+</style>

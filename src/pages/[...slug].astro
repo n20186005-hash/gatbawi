@@ -10,6 +10,7 @@ import {
   GROUP_ORDER,
 } from "../data/topics";
 
+export const prerender = true;
 export function getStaticPaths() {
   const paths: { params: { slug: string } }[] = [];
   for (const gid of GROUP_ORDER) {

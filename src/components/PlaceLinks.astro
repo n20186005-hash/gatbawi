@@ -1,0 +1,11 @@
+---
+import places from "../data/places.json";
+const en=Astro.url.pathname.startsWith("/en/");
+const lang=en ? "en" : "ko";
+---
+<section class="section places" id="nearby-places">
+  <h2>{en ? "Around Gatbawi and across Daegu" : "갓바위에서 이어지는 대구 여행"}</h2>
+  <p>{en ? "Combine the Palgongsan foothills with eastern Daegu, or reserve another day for downtown, the southern parks and Dalseong County." : "팔공산 자락과 대구 동부를 함께 돌아보세요. 도심과 남쪽 공원, 달성군은 별도의 하루 일정으로 둘러보기 좋습니다."}</p>
+  <ul>{places.map(p=><li><a href={(en ? "/en" : "") + "/places/" + p.slug + "/"}><img loading="lazy" width="150" height="100" src={p.photo} alt=""/><strong>{p[lang].name}</strong></a></li>)}</ul>
+</section>
+<style>.places{background:var(--paper-deep);color:var(--pine)}h2{font:600 clamp(2rem,4vw,3.5rem)/1.12 var(--display-ko)}html[lang=en] h2{font-family:var(--display-en)}p{max-width:68ch}ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:.8rem}a{display:flex;align-items:center;gap:.9rem;background:var(--paper);border-bottom:1px solid var(--line);min-height:5rem}a:hover strong{text-decoration:underline}img{width:6rem;height:5rem;object-fit:cover}strong{padding-right:.6rem}</style>

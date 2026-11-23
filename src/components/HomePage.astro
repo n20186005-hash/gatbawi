@@ -2,6 +2,7 @@
 /** Style note: This page follows the “mountain prayer stone” editorial route: granite matter, quiet ascent, cinnabar coordinates, and bilingual factual wayfinding. */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WeatherSection from "../components/WeatherSection.astro";
+import PlaceLinks from "../components/PlaceLinks.astro";
 import TopicLinks from "../components/TopicLinks.astro";
 
 const lang = Astro.url.pathname.startsWith("/en/") ? "en" : "ko";
@@ -413,6 +414,7 @@ const faqSchema = {
     </div>
   </section>
 
+  <PlaceLinks />
   <TopicLinks />
 
   <section class="section faq-section" aria-labelledby="faq-title">
