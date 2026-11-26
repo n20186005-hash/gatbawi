@@ -4,9 +4,9 @@ Independent Korean and English guide at https://gatbawi.com/. This is the Gwanbo
 
 ## Runtime and checks
 
-Astro 7 server rendering uses the existing Cloudflare adapter, native `/api/weather` endpoint and `ASSETS` binding. The configured production Worker is `gatbawi`. The repository pins Node 22.13.0 and pnpm 11.24.0.
+Astro 7 server rendering uses the existing Cloudflare adapter, native `/api/weather` endpoint and `ASSETS` binding. The configured production Worker is `gatbawi`. The repository pins Node 24.21.0 and pnpm 11.24.0.
 
-Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm build`, and `node --test tests/*.test.mjs`. Build uses `DEPLOY_TARGET=cloudflare`. Validate deployment packaging with `WRANGLER_SEND_METRICS=false pnpm exec wrangler deploy --config wrangler.worker.toml --dry-run`.
+Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm build`, and `node --test tests/*.test.mjs`. Build uses `DEPLOY_TARGET=cloudflare`. Validate deployment packaging with `WRANGLER_SEND_METRICS=false pnpm exec wrangler deploy --dry-run`.
 
 Korean routes: `/`, `/privacy/`, `/terms/`, `/cookies/`. English counterparts: `/en/`, `/en/privacy/`, `/en/terms/`, `/en/cookies/`. Server rendering removes the other locale’s display nodes; language links retain the corresponding topic. Privacy/error pages carry noindex; the sitemap lists indexable routes explicitly because the app renders on request. Custom errors render through Astro, without internally fetching an Assets `.html` canonical redirect.
 

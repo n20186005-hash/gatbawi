@@ -17,9 +17,10 @@ if (!group) throw new Error(`Unknown group ${topic.group}`);
 const title = content.metaTitle;
 const description = content.metaDescription;
 
-const homePath = "/";
-const groupPath = `/${topic.group}/`;
-const topicPath = `/${topic.slug}/`;
+const localePrefix = isEn ? "/en" : "";
+const homePath = `${localePrefix}/`;
+const groupPath = `${localePrefix}/${topic.group}/`;
+const topicPath = `${localePrefix}/${topic.slug}/`;
 
 const relatedTopics = topic.related
   .map((s) => getTopic(s))
@@ -129,7 +130,7 @@ const webPageLd = {
               const tg = getGroup(t.group);
               return (
                 <li>
-                  <a href={`/${t.slug}/`}>
+                  <a href={`${localePrefix}/${t.slug}/`}>
                     <span class="topic-related-title">
                       {isEn ? t.en.h1 : t.ko.h1}
                     </span>

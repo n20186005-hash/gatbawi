@@ -9,16 +9,16 @@
     "build": "DEPLOY_TARGET=cloudflare astro build",
     "preview": "DEPLOY_TARGET=cloudflare astro preview --host 0.0.0.0",
     "check": "astro check",
-    "deploy": "pnpm build && wrangler deploy --config ./wrangler.worker.toml"
+    "deploy": "pnpm build && wrangler deploy"
   },
   "engines": {
-    "node": "22.13.0"
+    "node": "24.21.0"
   },
   "packageManager": "pnpm@11.24.0",
   "dependencies": {
-    "@astrojs/cloudflare": "14.2.5",
+    "@astrojs/cloudflare": "14.4.9",
     "@astrojs/sitemap": "3.7.3",
-    "astro": "7.2.8",
+    "astro": "7.4.13",
     "parse5": "8.0.0"
   },
   "devDependencies": {
@@ -26,6 +26,6 @@
     "@tailwindcss/vite": "4.3.3",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
-    "wrangler": "4.126.0"
+    "wrangler": "4.168.0"
   }
 }

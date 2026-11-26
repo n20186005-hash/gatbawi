@@ -46,7 +46,7 @@ test('adapter builds the guarded entry from explicit configuration', () => {
 test('actual generated default handler redirects before its adapter delegate', async () => {
   const generated = fs.readFileSync('dist/server/entry.mjs', 'utf8');
   const start = generated.lastIndexOf('var worker_entry_default = ');
-  const end = generated.indexOf('\n//#endregion', start);
+  const end = generated.indexOf('\nexport { worker_entry_default as default }', start);
   assert.ok(start >= 0 && end > start);
   let called = 0;
   const handler = new Function('server_default', generated.slice(start, end) + '\nreturn worker_entry_default;')({ fetch() { called++; return delegated; } });

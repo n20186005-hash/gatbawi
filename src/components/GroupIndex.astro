@@ -17,8 +17,9 @@ const title = isEn
 const description = isEn ? group.introEn : group.introKo;
 
 const site = Astro.site?.href ?? "https://gatbawi.com/";
-const homePath = "/";
-const groupPath = `/${group.key}/`;
+const localePrefix = isEn ? "/en" : "";
+const homePath = `${localePrefix}/`;
+const groupPath = `${localePrefix}/${group.key}/`;
 const bcHome = new URL(homePath, site).href;
 const bcGroup = new URL(groupPath, site).href;
 
@@ -60,7 +61,7 @@ const webPageLd = {
       {
         topics.map((t) => (
           <li>
-            <a href={`/${t.slug}/`}>
+            <a href={`${localePrefix}/${t.slug}/`}>
               <span class="group-index-title">{isEn ? t.en.h1 : t.ko.h1}</span>
               <span class="group-index-desc">
                 {isEn ? t.en.metaDescription : t.ko.metaDescription}
