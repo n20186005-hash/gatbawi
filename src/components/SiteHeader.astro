@@ -2,6 +2,15 @@
 /** Style note: The header uses a stone-seal brand mark and a measured trail-marker navigation rhythm. */
 const english = Astro.url.pathname.startsWith("/en/");
 const topic = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
+const home = english ? "/en/" : "/";
+const menuItems = [
+  { hash: "understanding", ko: "소개", en: "Context" },
+  { hash: "arrival", ko: "방문 준비", en: "Plan" },
+  { hash: "route", ko: "교통", en: "Access" },
+  { hash: "map", ko: "지도", en: "Map" },
+  { hash: "nearby-places", ko: "주변 여행", en: "Nearby" },
+  { hash: "guides", ko: "안내", en: "Guides" },
+];
 ---
 
 <header class="site-header">
@@ -21,9 +30,28 @@ const topic = Astro.url.pathname.replace(/^\/en(?=\/|$)/, "") || "/";
       <a href="/#nearby-places"><span class="copy-ko">주변 여행</span><span class="copy-en">Nearby</span></a>
       <a href="/#guides"><span class="copy-ko">안내</span><span class="copy-en">Guides</span></a>
     </nav>
+    <details class="mobile-menu">
+      <summary>{english ? "Menu" : "메뉴"}</summary>
+      <nav aria-label={english ? "Mobile navigation" : "모바일 탐색"}>
+        {menuItems.map(item => <a href={`${home}#${item.hash}`}>{english ? item.en : item.ko}</a>)}
+      </nav>
+    </details>
     <div class="language-toggle" aria-label={english ? "Language" : "언어 선택"}>
       <a data-language-link href={topic} lang="ko">한국어</a>
       <a data-language-link href={topic === "/" ? "/en/" : `/en${topic}`} lang="en">EN</a>
     </div>
   </div>
 </header>
+<script>
+  document.querySelectorAll<HTMLDetailsElement>(".mobile-menu").forEach((menu) => {
+    menu.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("nav a")) menu.open = false;
+    });
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.open) {
+        menu.open = false;
+        menu.querySelector("summary")?.focus();
+      }
+    });
+  });
+</script>
